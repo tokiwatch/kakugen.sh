@@ -53,11 +53,13 @@
 
 > **Note**: 複数のテキストファイルを読み込むように設定（または `-f` オプションで複数指定）した場合、どの格言集からの言葉か判別できるように、格言の末尾に自動で出典元（例: `-- sample_ja`）が表示されます。
 
+設定ファイルで `ファイルパス=タイトル` のように `=` で区切って記述することで、ファイル名の代わりにお好みのタイトルを出典として表示させることができます。
+
 **`~/.kakugenrc` の例:**
 ```text
 # 行頭に # をつけるとコメントになります
-~/.config/kakugen/sample_ja.txt
-~/.config/kakugen/sample_en.txt
+~/.config/kakugen/sample_ja.txt=日本の格言
+~/.config/kakugen/sample_en.txt=English Quotes
 ```
 
 ### ターミナル起動時に実行する設定

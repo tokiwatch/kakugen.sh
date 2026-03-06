@@ -22,10 +22,12 @@ $ kakugen -n 1 -f ~/.config/kakugen/sample_ja.txt
 
 ### 設定ファイル (`~/.kakugenrc`)
 デフォルトでは `~/.kakugenrc` を読み込み、そこに記述されたすべてのファイルを対象にシャッフルを行う。
+また、`ファイルパス=タイトル` のように記述することで、複数ファイル読み込み時の出典表示を任意のタイトルに変更できる。
+
 ```text
 # 読み込みたいファイルパスを1行ずつ記述
-~/.config/kakugen/sample_ja.txt
-~/.config/kakugen/sample_en.txt
+~/.config/kakugen/sample_ja.txt=日本の格言
+~/.config/kakugen/sample_en.txt=English Quotes
 ```
 
 ## 3. データフォーマットの標準化

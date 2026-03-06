@@ -80,6 +80,21 @@ else
     exit 1
 fi
 
+# 設定ファイルでタイトル付きのパーステスト
+cat << 'CONFIG_TITLE' > "$TEST_DIR/test_rc_title"
+$TEST_DIR/test1.txt=Custom Title 1
+$TEST_DIR/test2.txt=Custom Title 2
+CONFIG_TITLE
+
+actual_rc_title=$(./kakugen.sh -n 1 -c "$TEST_DIR/test_rc_title" -s "Quote A")
+if [[ "$actual_rc_title" == *"-- Custom Title 1" ]]; then
+    echo "✅ PASS: Read config file with custom titles"
+else
+    echo "❌ FAIL: Read config file with custom titles"
+    echo "  Actual: '$actual_rc_title'"
+    exit 1
+fi
+
 # 検索機能 (-s) のテスト
 actual_search=$(./kakugen.sh -n 1 -f "$TEST_DIR/test1.txt" -s "Line 2")
 assert_eq "Quote B"$'\n'"Line 2" "$actual_search" "Search and extract specific quote"

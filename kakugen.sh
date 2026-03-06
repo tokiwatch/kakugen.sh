@@ -4,6 +4,7 @@
 NUM_CARDS=1
 CONFIG_FILE="$HOME/.kakugenrc"
 DATA_FILES=()
+FILE_TITLES=() # Bash 3互換のため、パスとタイトルを「パス=タイトル」の形式で配列に保持する
 SEARCH_QUERY=""
 
 # 引数のパース
@@ -46,9 +47,21 @@ if [ ${#DATA_FILES[@]} -eq 0 ]; then
             [[ "$line" =~ ^[[:space:]]*# ]] && continue
             [[ -z "${line// }" ]] && continue
             
+            # "=" で分割してファイルパスとタイトルを取得
+            if [[ "$line" == *"="* ]]; then
+                raw_path="${line%%=*}"
+                title="${line#*=}"
+            else
+                raw_path="$line"
+                title=""
+            fi
+            
             # ~ を $HOME に展開、環境変数を展開 (evalを使用)
-            eval "expanded_path=\"$line\""
+            eval "expanded_path=\"$raw_path\""
             DATA_FILES+=("$expanded_path")
+            if [ -n "$title" ]; then
+                FILE_TITLES+=("$expanded_path=$title")
+            fi
         done < "$CONFIG_FILE"
     else
         # ~/.kakugenrc が無い場合のフォールバック（初回実行用・手軽にテストできるようにするため）
@@ -79,11 +92,22 @@ if [ ${#VALID_FILES[@]} -gt 1 ]; then
 fi
 
 for file in "${VALID_FILES[@]}"; do
-    fname=$(basename "$file")
-    fname="${fname%.*}" # 拡張子を除外
+    # タイトルが設定されていればそれを使用し、なければファイル名(拡張子なし)を使用
+    source_name=""
+    for item in "${FILE_TITLES[@]}"; do
+        if [[ "$item" == "$file="* ]]; then
+            source_name="${item#*=}"
+            break
+        fi
+    done
     
-    # 複数ファイルの場合は出典元がわかるようにファイル名を埋め込む
-    echo "@@@FNAME=${fname}@@@" >> "$TEMP_FILE"
+    if [ -z "$source_name" ]; then
+        source_name=$(basename "$file")
+        source_name="${source_name%.*}" # 拡張子を除外
+    fi
+    
+    # 複数ファイルの場合は出典元がわかるようにタイトル（またはファイル名）を埋め込む
+    echo "@@@FNAME=${source_name}@@@" >> "$TEMP_FILE"
     echo "%" >> "$TEMP_FILE"
     
     # ファイルの末尾に改行と % が無い場合に備えて追加しつつテンポラリに結合

@@ -52,11 +52,13 @@ By default, Kakugen reads the file paths listed in `~/.kakugenrc`. Create this f
 
 > **Note**: When multiple text files are loaded (either via config or the `-f` option), the source filename (without extension, e.g., `-- sample_ja`) is automatically appended to each quote to indicate its origin.
 
+You can customize the displayed title by appending `=Your Custom Title` to the file path in `.kakugenrc`.
+
 **Example `~/.kakugenrc`:**
 ```text
 # Lines starting with # are comments
-~/.config/kakugen/sample_ja.txt
-~/.config/kakugen/sample_en.txt
+~/.config/kakugen/sample_ja.txt=Japanese Proverbs
+~/.config/kakugen/sample_en.txt=English Quotes
 ```
 
 ### Setting up to run on terminal startup
