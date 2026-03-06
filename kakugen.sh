@@ -7,6 +7,11 @@ DATA_FILES=()
 FILE_TITLES=() # Bash 3互換のため、パスとタイトルを「パス=タイトル」の形式で配列に保持する
 SEARCH_QUERY=""
 
+# 色のデフォルト設定
+COLOR_TEXT="cyan"
+COLOR_SYMBOL="cyan"
+COLOR_TITLE="gray"
+
 # 引数のパース
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -46,6 +51,18 @@ if [ ${#DATA_FILES[@]} -eq 0 ]; then
             # コメントと空行をスキップ
             [[ "$line" =~ ^[[:space:]]*# ]] && continue
             [[ -z "${line// }" ]] && continue
+            
+            # 色設定のパース
+            if [[ "$line" == COLOR_TEXT=* ]]; then
+                COLOR_TEXT="${line#*=}"
+                continue
+            elif [[ "$line" == COLOR_SYMBOL=* ]]; then
+                COLOR_SYMBOL="${line#*=}"
+                continue
+            elif [[ "$line" == COLOR_TITLE=* ]]; then
+                COLOR_TITLE="${line#*=}"
+                continue
+            fi
             
             # "=" で分割してファイルパスとタイトルを取得
             if [[ "$line" == *"="* ]]; then
@@ -123,10 +140,34 @@ for file in "${VALID_FILES[@]}"; do
     echo "%" >> "$TEMP_FILE"
 done
 
+# 色の名前をANSIコードに変換する関数
+map_color() {
+    local val
+    val=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+    case "$val" in
+        black) echo "30" ;;
+        red) echo "31" ;;
+        green) echo "32" ;;
+        yellow) echo "33" ;;
+        blue) echo "34" ;;
+        magenta) echo "35" ;;
+        cyan) echo "36" ;;
+        white) echo "37" ;;
+        gray|grey) echo "90" ;;
+        none|"") echo "" ;;
+        *) echo "$val" ;; # 直接数値指定された場合など
+    esac
+}
+
+COLOR_TEXT_CODE=$(map_color "$COLOR_TEXT")
+COLOR_SYMBOL_CODE=$(map_color "$COLOR_SYMBOL")
+COLOR_TITLE_CODE=$(map_color "$COLOR_TITLE")
+
 # awkを使って % を区切り（RS）としてパースし、各ブロックを配列に格納してからランダムに出力する
 # shuf や sort は改行を含むデータに弱いため、awk 内ですべてのランダム抽出処理を完結させる。
 
-awk -v num="$NUM_CARDS" -v search="$SEARCH_QUERY" -v multi="$MULTI_FILE" '
+awk -v num="$NUM_CARDS" -v search="$SEARCH_QUERY" -v multi="$MULTI_FILE" \
+    -v c_text="$COLOR_TEXT_CODE" -v c_sym="$COLOR_SYMBOL_CODE" -v c_title="$COLOR_TITLE_CODE" '
 BEGIN {
     RS="(^|\n)%(\n|$)" # %の行をレコードセパレータとする
     srand()
@@ -173,12 +214,20 @@ END {
     
     # 指定個数を出力
     for (i = 0; i < num; i++) {
-        # エスケープシーケンス: \033[3m=イタリック, \033[36m=シアン色, \033[0m=リセット
-        # 格言の本文のみをスマートクォートで囲む
-        printf "\033[3m\033[36m“\033[0m\033[3m%s\033[36m”\033[0m\n", cards[i]
+        italic = "\033[3m"
+        reset = "\033[0m"
+        
+        q_color = (c_text != "") ? "\033[" c_text "m" : ""
+        s_color = (c_sym != "") ? "\033[" c_sym "m" : ""
+        t_color = (c_title != "") ? "\033[" c_title "m" : ""
+
+        out = italic s_color "“" reset
+        out = out italic q_color cards[i] reset
+        out = out italic s_color "”" reset
+        
+        print out
         if (multi == 1 && titles[i] != "") {
-            # タイトルはイタリックにせず右寄せ風に表示する、または控えめに表示
-            printf "\033[90m-- %s\033[0m\n", titles[i]
+            print t_color "-- " titles[i] reset
         }
     }
 }

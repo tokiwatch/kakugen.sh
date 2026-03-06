@@ -54,8 +54,20 @@ By default, Kakugen reads the file paths listed in `~/.kakugenrc`. Create this f
 
 You can customize the displayed title by appending `=Your Custom Title` to the file path in `.kakugenrc`.
 
+You can also customize the colors by adding the following settings:
+- `COLOR_TEXT`: Color of the quote text (Default: `cyan`)
+- `COLOR_SYMBOL`: Color of the smart quotes (Default: `cyan`)
+- `COLOR_TITLE`: Color of the source title (Default: `gray`)
+
+Available colors: `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `gray` (or `none` to disable color).
+
 **Example `~/.kakugenrc`:**
 ```text
+# Color Customizations
+COLOR_TEXT=green
+COLOR_SYMBOL=yellow
+COLOR_TITLE=gray
+
 # Lines starting with # are comments
 ~/.config/kakugen/sample_ja.txt=Japanese Proverbs
 ~/.config/kakugen/sample_en.txt=English Quotes

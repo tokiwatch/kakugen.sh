@@ -46,7 +46,7 @@
 | `-c` | `--config` | 設定ファイルのパス | `~/.kakugenrc` | `-c ~/.custom_rc` |
 | `-s` | `--search` | 指定した文字列を含む格言のみを抽出 | なし | `-s "ことわざ"` |
 
-### 対象ファイルの設定 (`~/.kakugenrc`)
+### 対象ファイルと色の設定 (`~/.kakugenrc`)
 
 デフォルトでは、ホームディレクトリにある `~/.kakugenrc` ファイルに記載されたテキストファイルをすべて読み込みます。
 このファイルを作成し、読み込みたいテキストファイルのパスを記述してください。
@@ -55,8 +55,20 @@
 
 設定ファイルで `ファイルパス=タイトル` のように `=` で区切って記述することで、ファイル名の代わりにお好みのタイトルを出典として表示させることができます。
 
+また、文字の色をカスタマイズすることも可能です。以下の設定キーを使用します：
+- `COLOR_TEXT`: 格言本文の色（デフォルト: `cyan`）
+- `COLOR_SYMBOL`: スマートクォート（“ ”）の色（デフォルト: `cyan`）
+- `COLOR_TITLE`: タイトル・出典元の色（デフォルト: `gray`）
+
+使用可能な色: `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `gray` (`none` で色付けなし)
+
 **`~/.kakugenrc` の例:**
 ```text
+# 色のカスタマイズ（省略可能）
+COLOR_TEXT=green
+COLOR_SYMBOL=yellow
+COLOR_TITLE=gray
+
 # 行頭に # をつけるとコメントになります
 ~/.config/kakugen/sample_ja.txt=日本の格言
 ~/.config/kakugen/sample_en.txt=English Quotes
