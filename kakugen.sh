@@ -61,36 +61,64 @@ fi
 
 # 有効なファイルの存在確認と結合
 TEMP_FILE=$(mktemp)
+VALID_FILES=()
 for file in "${DATA_FILES[@]}"; do
     if [ -f "$file" ]; then
-        # ファイルの末尾に改行と % が無い場合に備えて追加しつつテンポラリに結合
-        cat "$file" >> "$TEMP_FILE"
-        echo "" >> "$TEMP_FILE"
-        echo "%" >> "$TEMP_FILE"
+        VALID_FILES+=("$file")
     fi
 done
 
-# テンポラリファイルが空（読み込めるファイルが一つもない）場合は終了
-if [ ! -s "$TEMP_FILE" ]; then
+if [ ${#VALID_FILES[@]} -eq 0 ]; then
     rm -f "$TEMP_FILE"
     exit 0
 fi
 
+MULTI_FILE=0
+if [ ${#VALID_FILES[@]} -gt 1 ]; then
+    MULTI_FILE=1
+fi
+
+for file in "${VALID_FILES[@]}"; do
+    fname=$(basename "$file")
+    fname="${fname%.*}" # 拡張子を除外
+    
+    # 複数ファイルの場合は出典元がわかるようにファイル名を埋め込む
+    echo "@@@FNAME=${fname}@@@" >> "$TEMP_FILE"
+    echo "%" >> "$TEMP_FILE"
+    
+    # ファイルの末尾に改行と % が無い場合に備えて追加しつつテンポラリに結合
+    cat "$file" >> "$TEMP_FILE"
+    echo "" >> "$TEMP_FILE"
+    echo "%" >> "$TEMP_FILE"
+done
+
 # awkを使って % を区切り（RS）としてパースし、各ブロックを配列に格納してからランダムに出力する
 # shuf や sort は改行を含むデータに弱いため、awk 内ですべてのランダム抽出処理を完結させる。
 
-awk -v num="$NUM_CARDS" -v search="$SEARCH_QUERY" '
+awk -v num="$NUM_CARDS" -v search="$SEARCH_QUERY" -v multi="$MULTI_FILE" '
 BEGIN {
     RS="(^|\n)%(\n|$)" # %の行をレコードセパレータとする
     srand()
     count = 0
+    current_fname = ""
 }
 {
     # 先頭と末尾の空白/改行をトリム
     gsub(/^[ \t\n]+|[ \t\n]+$/, "", $0)
+    
+    # ファイル名マーカーの検出
+    if (match($0, /^@@@FNAME=.*@@@$/)) {
+        current_fname = substr($0, 10, length($0) - 12)
+        next
+    }
+    
     if (length($0) > 0) {
         if (search == "" || index($0, search) > 0) {
-            cards[count] = $0
+            if (multi == 1) {
+                cards[count] = $0 "\n-- " current_fname
+            } else {
+                cards[count] = $0
+            }
             count++
         }
     }

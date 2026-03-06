@@ -50,6 +50,8 @@ Run the script to display a quote:
 
 By default, Kakugen reads the file paths listed in `~/.kakugenrc`. Create this file to specify which quote files you want to include in the random selection.
 
+> **Note**: When multiple text files are loaded (either via config or the `-f` option), the source filename (without extension, e.g., `-- sample_ja`) is automatically appended to each quote to indicate its origin.
+
 **Example `~/.kakugenrc`:**
 ```text
 # Lines starting with # are comments

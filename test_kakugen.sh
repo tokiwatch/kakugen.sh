@@ -29,6 +29,12 @@ Line 2
 Quote C
 QUOTE
 
+cat << 'QUOTE' > "$TEST_DIR/test2.txt"
+Quote D
+%
+Quote E
+QUOTE
+
 # 1件取得
 actual=$(./kakugen.sh -n 1 -f "$TEST_DIR/test1.txt")
 if [[ "$actual" == "Quote A" || "$actual" == "Quote B"$'\n'"Line 2" || "$actual" == "Quote C" ]]; then
@@ -36,6 +42,16 @@ if [[ "$actual" == "Quote A" || "$actual" == "Quote B"$'\n'"Line 2" || "$actual"
 else
     echo "❌ FAIL: Single quote extraction from specified file"
     echo "  Actual: '$actual'"
+    exit 1
+fi
+
+# 複数ファイルからの取得（出典元が追加されること）
+actual_multi=$(./kakugen.sh -n 1 -f "$TEST_DIR/test1.txt","$TEST_DIR/test2.txt")
+if [[ "$actual_multi" == *"Quote "* && "$actual_multi" == *"-- test"* ]]; then
+    echo "✅ PASS: Multiple files append source filename"
+else
+    echo "❌ FAIL: Multiple files append source filename"
+    echo "  Actual: '$actual_multi'"
     exit 1
 fi
 
