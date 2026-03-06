@@ -75,6 +75,8 @@ If you moved it to your path:
 kakugen -n 1
 ```
 
+> **Note on Styling**: This application uses ANSI escape sequences to display quotes in *italics* for a more elegant look. If your terminal emulator or selected font does not support italics, the text may appear as regular text or be highlighted differently.
+
 ## Adding Custom Quotes
 
 Quotes are stored in plain text files and are separated by a line containing only a **`%`** symbol. This allows for multi-line quotes.

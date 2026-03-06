@@ -145,10 +145,9 @@ BEGIN {
     
     if (length($0) > 0) {
         if (search == "" || index($0, search) > 0) {
+            cards[count] = $0
             if (multi == 1) {
-                cards[count] = $0 "\n-- " current_fname
-            } else {
-                cards[count] = $0
+                titles[count] = current_fname
             }
             count++
         }
@@ -164,13 +163,23 @@ END {
         temp = cards[i]
         cards[i] = cards[j]
         cards[j] = temp
+        
+        if (multi == 1) {
+            temp_title = titles[i]
+            titles[i] = titles[j]
+            titles[j] = temp_title
+        }
     }
     
     # 指定個数を出力
     for (i = 0; i < num; i++) {
         # エスケープシーケンス: \033[3m=イタリック, \033[36m=シアン色, \033[0m=リセット
-        # 格言の前後をスマートクォートで囲む
+        # 格言の本文のみをスマートクォートで囲む
         printf "\033[3m\033[36m“\033[0m\033[3m%s\033[36m”\033[0m\n", cards[i]
+        if (multi == 1 && titles[i] != "") {
+            # タイトルはイタリックにせず右寄せ風に表示する、または控えめに表示
+            printf "\033[90m-- %s\033[0m\n", titles[i]
+        }
     }
 }
 ' "$TEMP_FILE"
