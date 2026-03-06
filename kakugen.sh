@@ -4,6 +4,7 @@
 NUM_CARDS=1
 CONFIG_FILE="$HOME/.kakugenrc"
 DATA_FILES=()
+SEARCH_QUERY=""
 
 # 引数のパース
 while [[ "$#" -gt 0 ]]; do
@@ -18,12 +19,14 @@ while [[ "$#" -gt 0 ]]; do
             shift
             ;;
         -c|--config) CONFIG_FILE="$2"; shift ;;
+        -s|--search) SEARCH_QUERY="$2"; shift ;;
         -h|--help)
-            echo "Usage: kakugen [-n number] [-f file1,file2...] [-c config_file]"
+            echo "Usage: kakugen [-n number] [-f file1,file2...] [-c config_file] [-s search_query]"
             echo "Options:"
             echo "  -n, --number <int>    表示する格言の個数 (デフォルト: 1)"
             echo "  -f, --file <paths>    読み込むファイル(カンマ区切り)。指定時は設定ファイルを無視。"
             echo "  -c, --config <path>   設定ファイルのパス (デフォルト: ~/.kakugenrc)"
+            echo "  -s, --search <str>    指定した文字列を含む格言のみを抽出"
             exit 0
             ;;
         *)
@@ -76,7 +79,7 @@ fi
 # awkを使って % を区切り（RS）としてパースし、各ブロックを配列に格納してからランダムに出力する
 # shuf や sort は改行を含むデータに弱いため、awk 内ですべてのランダム抽出処理を完結させる。
 
-awk -v num="$NUM_CARDS" '
+awk -v num="$NUM_CARDS" -v search="$SEARCH_QUERY" '
 BEGIN {
     RS="(^|\n)%(\n|$)" # %の行をレコードセパレータとする
     srand()
@@ -86,8 +89,10 @@ BEGIN {
     # 先頭と末尾の空白/改行をトリム
     gsub(/^[ \t\n]+|[ \t\n]+$/, "", $0)
     if (length($0) > 0) {
-        cards[count] = $0
-        count++
+        if (search == "" || index($0, search) > 0) {
+            cards[count] = $0
+            count++
+        }
     }
 }
 END {

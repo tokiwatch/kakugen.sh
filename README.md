@@ -44,6 +44,7 @@ Run the script to display a quote:
 | `-n` | `--number` | Number of quotes to display | `1` | `-n 3` |
 | `-f` | `--file` | File paths to read (comma-separated). Overrides config. | None | `-f quotes.txt` |
 | `-c` | `--config` | Path to configuration file | `~/.kakugenrc` | `-c ~/.myrc` |
+| `-s` | `--search` | Filter quotes by a specific substring | None | `-s "Rome"` |
 
 ### Configuration File (`~/.kakugenrc`)
 
