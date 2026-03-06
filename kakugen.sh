@@ -56,8 +56,15 @@ if [ ${#DATA_FILES[@]} -eq 0 ]; then
                 title=""
             fi
             
-            # ~ を $HOME に展開、環境変数を展開 (evalを使用)
-            eval "expanded_path=\"$raw_path\""
+            # ~ を $HOME に展開
+            # eval時のダブルクォートを外すことでチルダ展開を有効にする
+            # ただし、スペースを含むパスが誤動作しないように、チルダ展開後に再度クォートで括る処理が理想的だが、
+            # 最もシンプルなチルダ置換を利用する (${raw_path/#\~/$HOME})
+            expanded_path="${raw_path/#\~/$HOME}"
+            
+            # 環境変数を展開 (evalを使用)
+            eval "expanded_path=\"$expanded_path\""
+            
             DATA_FILES+=("$expanded_path")
             if [ -n "$title" ]; then
                 FILE_TITLES+=("$expanded_path=$title")
