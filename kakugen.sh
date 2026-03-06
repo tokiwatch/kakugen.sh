@@ -169,9 +169,6 @@ END {
     # 指定個数を出力
     for (i = 0; i < num; i++) {
         print cards[i]
-        if (i < num - 1) {
-            print "" # 複数表示する場合の空行
-        }
     }
 }
 ' "$TEMP_FILE"

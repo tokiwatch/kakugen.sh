@@ -57,7 +57,7 @@ fi
 
 # 複数件（全件）取得
 actual_lines=$(./kakugen.sh -n 3 -f "$TEST_DIR/test1.txt" | wc -l | tr -d ' ')
-assert_eq "6" "$actual_lines" "Extract multiple quotes with blank line separator"
+assert_eq "4" "$actual_lines" "Extract multiple quotes with blank line separator"
 
 # 存在しないファイル
 actual_empty=$(./kakugen.sh -n 1 -f "$TEST_DIR/not_exist.txt")
