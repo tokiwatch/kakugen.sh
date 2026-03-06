@@ -42,9 +42,19 @@ Run the script to display a quote:
 | Short | Long | Description | Default | Example |
 |---|---|---|---|---|
 | `-n` | `--number` | Number of quotes to display | `1` | `-n 3` |
-| `-s` | `--series` | Series name | `sample` | `-s jobs` |
-| `-l` | `--lang` | Language code | `ja` | `-l en` |
-| `-d` | `--dir` | Data directory | `~/.config/kakugen/`| `-d /path/to/data` |
+| `-f` | `--file` | File paths to read (comma-separated). Overrides config. | None | `-f quotes.txt` |
+| `-c` | `--config` | Path to configuration file | `~/.kakugenrc` | `-c ~/.myrc` |
+
+### Configuration File (`~/.kakugenrc`)
+
+By default, Kakugen reads the file paths listed in `~/.kakugenrc`. Create this file to specify which quote files you want to include in the random selection.
+
+**Example `~/.kakugenrc`:**
+```text
+# Lines starting with # are comments
+~/.config/kakugen/sample_ja.txt
+~/.config/kakugen/sample_en.txt
+```
 
 ### Setting up to run on terminal startup
 
@@ -57,13 +67,25 @@ To display a quote every time you open a new terminal, add the command to the en
 
 If you moved it to your path:
 ```bash
-kakugen -n 1 -l en
+kakugen -n 1
 ```
 
 ## Adding Custom Quotes
 
-Quotes are stored in plain text files.
-1. Create a file named `<series>_<lang>.txt` (e.g., `zen_en.txt`).
-2. Write one quote per line.
-3. Blank lines or lines starting with `#` are ignored.
-4. Place the file in `~/.config/kakugen/`.
+Quotes are stored in plain text files and are separated by a line containing only a **`%`** symbol. This allows for multi-line quotes.
+
+1. Create a text file.
+2. Separate each quote using a line with just `%`.
+3. Add the path of your new file to `~/.kakugenrc`.
+
+**Example data file:**
+```text
+Rome wasn't built in a day.
+%
+Perseverance will win in the end.
+(Japanese proverb)
+%
+A journey of a thousand miles begins with a single step.
+- Laozi
+%
+```
